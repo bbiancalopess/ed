@@ -1,36 +1,25 @@
-# Nome do compilador
 COMPILADOR = g++
-
-# Nome do executável
-TARGET = bin/matop
-
-# Flags de compilação
 COMP_FLAGS = -Iinclude -Wall -std=c++11
+SOURCES_DIR = src
+OBJECTS_DIR = obj
+BIN_DIR = bin
+TARGET = $(BIN_DIR)/matop
 
-# Lista de arquivos fontes
-SOURCES = $(wildcard src/*.cpp)
+SOURCES = $(SOURCES_DIR)/mat.cpp $(SOURCES_DIR)/matop.cpp
 
-# Geração dos arquivos objetos
-OBJECTS = $(SOURCES:src/%.cpp=obj/%.o)
+OBJECTS = $(OBJECTS_DIR)/mat.o $(OBJECTS_DIR)/matop.o
 
-# Regra padrão para compilar e linkar o projeto
 all: $(TARGET)
 
-# Regra para gerar o executável
-$(TARGET): $(OBJECTS)
-	@mkdir -p bin
-	$(COMPILADOR) $(OBJECTS) -o $(TARGET)
+$(TARGET): $(OBJECTS) | $(BIN_DIR)
+	$(COMPILADOR) $(COMP_FLAGS) -o $@ $^
 
-# Regra para gerar os arquivos objeto
-obj/%.o: src/%.cpp
-	@mkdir -p obj
+$(OBJECTS_DIR)/%.o: $(SOURCES_DIR)/%.cpp | $(OBJECTS_DIR)
 	$(COMPILADOR) $(COMP_FLAGS) -c $< -o $@
 
-# Comando para limpar os arquivos objeto e do executável
 clean:
-	rm -rf obj/*.o $(TARGET)
+	rm -rf $(OBJECTS_DIR)/*.o $(TARGET)
 
-# Comando para rodar o programa
 run: all
 	./$(TARGET) -s -x 5 -y 5
 	./$(TARGET) -m -x 5 -y 5
