@@ -1,21 +1,44 @@
-COMPILADOR = g++
-COMP_FLAGS = -Iinclude -Wall -std=c++11
-TARGET = pa1.out
+COMPILADOR = gcc
+COMPFLAGS = -Iinclude -Wall
+TARGET = bin/pa1.out
 
-SOURCES = utils.cpp performance.cpp algorithms.cpp args.cpp main.cpp
+# Lista de arquivos fontes
+SRCS = $(wildcard src/*.c)
 
-OBJECTS = utils.o performance.o algorithms.o args.o main.o
+# Geração dos arquivos objetos
+OBJS = $(SRCS:src/%.cpp=obj/%.o)
 
+# Regra padrão para compilar e linkar o projeto
 all: $(TARGET)
 
-$(TARGET): $(OBJECTS) 
-	$(COMPILADOR) $(COMP_FLAGS) -o $@ $^
+# Regra para gerar o executável
+$(TARGET): $(OBJS)
+	@mkdir -p bin
+	$(COMPILADOR) $(COMPFLAGS) $(OBJS) -o $(TARGET)
 
-%.o: %.cpp 
-	$(COMPILADOR) $(COMP_FLAGS) -c $< -o $@
+# Regra para gerar os arquivos objeto
+obj/%.o: src/%.cpp | obj
+	$(COMPILADOR) $(COMPFLAGS) -c $< -o $@
 
+# Garante que o diretório obj exista
+obj:
+	@mkdir -p obj
+
+# Comando para limpar os arquivos objeto e do executável
 clean:
-	rm -rf $(OBJECTS) $(TARGET)
+	rm -rf obj/*.o $(TARGET)
 
-run: all
-	./$(TARGET)
+# Comando para rodar testes
+test: all
+	./$(TARGET) -z 9 -s 27 -a q3
+	./$(TARGET) -z 81 -s 17 -a q3
+	./$(TARGET) -z 448 -s 15 -a q3
+	./$(TARGET) -z 4803 -s 34 -a q3
+	./$(TARGET) -z 19097 -s 25 -a q3
+	./$(TARGET) -z 9 -s 27 -a q3i
+	./$(TARGET) -z 81 -s 17 -a q3i
+	./$(TARGET) -z 448 -s 15 -a q3i
+	./$(TARGET) -z 4803 -s 34 -a q3i
+	./$(TARGET) -z 19097 -s 25 -a q3i
+	
+	

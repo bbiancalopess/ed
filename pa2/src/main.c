@@ -1,11 +1,5 @@
-#include "performance.hpp"
-#include "args.hpp"
-#include "algorithms.hpp"
-#include "utils.hpp"
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-
+#include "../include/utils.h"
+#include "../include/sort_algs.h"
 
 int main (int argc, char ** argv){
   sortperf_t s;
@@ -30,7 +24,6 @@ int main (int argc, char ** argv){
   //if (opt.size < 100) printVector(vet, opt.size);
 
   retp = clock_gettime(CLOCK_MONOTONIC, &inittp);
-  
   // execute algorithm
   switch (opt.alg){
     case ALGINSERTION:
