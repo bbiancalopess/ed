@@ -5,8 +5,10 @@
 #include <unistd.h>
 #include <time.h>
 
-#define FIBONACCI 1
-#define FACTORIAL 2
+#define ITERATIVE_FIBONACCI 1
+#define RECURSIVE_FIBONACCI 2
+#define ITERATIVE_FACTORIAL 3
+#define RECURSIVE_FACTORIAL 4
 
 typedef struct Algorithm{
   int id;
@@ -16,21 +18,20 @@ typedef struct Algorithm{
 typedef struct Options{
   int value;
   int algorithm;
-  int isRecursive;
-  int isIterative;
 } Options;
 
 Algorithm algorithms[] = {
-  {FIBONACCI,"fi"},
-  {FACTORIAL,"fa"},
+  {ITERATIVE_FIBONACCI,"fii"},
+  {RECURSIVE_FIBONACCI,"fir"},
+  {ITERATIVE_FACTORIAL,"fai"},
+  {RECURSIVE_FACTORIAL,"far"},
   {0, NULL}
 };
 
 void printUsage() {
   fprintf(stderr, "Uso: programa [opções]\n");
   fprintf(stderr, "Opções:\n");
-  fprintf(stderr, "\t-a <fi|fa>\tSeleciona o algoritmo (fi para Fibonacci, fa para Fatorial)\n");
-  fprintf(stderr, "\t<-r|-i>\t\tExecuta de forma recursiva ou iterativa\n");
+  fprintf(stderr, "\t-a <fii|fir|fai|far>\tSeleciona o algoritmo (fii para Fibonacci Iterativo, fir para Fibonacci Recursivo, fai para Fatorial Iterativo, far para Fatorial Recursivo)\n");
   fprintf(stderr, "\t-v <int>\tDefine o valor a ser calculado\n");
   fprintf(stderr, "\t-h\t\tExibe esta ajuda\n");
 }
@@ -42,6 +43,13 @@ int getAlgorithmId(const char * name){
   return 0;
 }
 
+const char * getAlgorithmNameById(int id) {
+  for (int i = 0; algorithms[i].id != 0; i++) {
+    if(algorithms[i].id == id) return algorithms[i].name;
+  }
+  return "";
+}
+
 void parseArguments(int argc, char ** argv, Options * opt) {
   extern char * optarg;
   int c;
@@ -49,22 +57,12 @@ void parseArguments(int argc, char ** argv, Options * opt) {
   // inicializacao variaveis globais para opcoes
   opt->value = 0;
   opt->algorithm = 0;
-  opt->isIterative = 0;
-  opt->isRecursive = 0;
 
   // Processamento de argumentos com getopt
-  while ((c = getopt(argc, argv, "a:riv:h")) != -1){
+  while ((c = getopt(argc, argv, "a:v:h")) != -1){
     switch(c) {
       case 'a':
         opt->algorithm = getAlgorithmId(optarg);
-        break;
-      case 'r':
-        opt->isRecursive = 1;
-        opt->isIterative = 0;
-        break;
-      case 'i':
-        opt->isRecursive = 0;
-        opt->isIterative = 1;
         break;
       case 'v':
         opt->value = atoi(optarg);
@@ -86,29 +84,27 @@ void parseArguments(int argc, char ** argv, Options * opt) {
     printUsage();
     exit(EXIT_FAILURE);
   }
-
-  if (!(opt->isRecursive || opt->isIterative)) {
-    fprintf(stderr, "Erro: Escolha entre execução recursiva (-r) ou iterativa (-i).\n");
-    printUsage();
-    exit(EXIT_FAILURE);
-  }
 }
 
 int main (int argc, char ** argv){
   Options opt;
   parseArguments(argc, argv, &opt);
-  long int response;
+  long long int response;
   struct timespec start, end;
   clock_gettime(CLOCK_MONOTONIC, &start);
 
   switch (opt.algorithm){
-    case FIBONACCI:
-      if (opt.isRecursive == 1) response = recursiveFibonacci(opt.value);
-      else response = iterativeFibonacci(opt.value);
+    case RECURSIVE_FIBONACCI:
+      response = recursiveFibonacci(opt.value);
       break;
-    case FACTORIAL:
-      if (opt.isRecursive == 1) response = recursiveFactorial(opt.value);
-      else response = iterativeFactorial(opt.value);
+    case ITERATIVE_FIBONACCI:
+      response = iterativeFibonacci(opt.value);
+      break;
+    case RECURSIVE_FACTORIAL:
+      response = recursiveFactorial(opt.value);
+      break;
+    case ITERATIVE_FACTORIAL:
+      response = iterativeFactorial(opt.value);
       break;
     default:
       fprintf(stderr, "Erro: Algoritmo desconhecido.\n");
@@ -118,9 +114,19 @@ int main (int argc, char ** argv){
 
   clock_gettime(CLOCK_MONOTONIC, &end);
 
-  double elapsed = (end.tv_sec - start.tv_sec) * 1000.0 + (end.tv_nsec - start.tv_nsec) / 1e6;
-  printf("Valor retornado: %ld\n", response);
-  printf("Tempo de execução: %f ms\n", elapsed);
+  double elapsed = (end.tv_sec - start.tv_sec) * 1e9 + (end.tv_nsec - start.tv_nsec);
+
+  FILE *fp = fopen("../csv/tempoDeRelogio.csv", "a");
+  if (fp == NULL) {
+    perror("Error opening file");
+    exit(EXIT_FAILURE);
+  }
+
+  fprintf(fp, "%s, %d, %f\n", getAlgorithmNameById(opt.algorithm), opt.value, elapsed);
+  fclose(fp);
+
+  printf("Valor retornado: %lld\n", response);
+  printf("Tempo de execução: %f ns\n", elapsed);
 
   return EXIT_SUCCESS;
 }
