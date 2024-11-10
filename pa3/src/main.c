@@ -91,30 +91,38 @@ int main (int argc, char ** argv){
   parseArguments(argc, argv, &opt);
   long long int response;
   struct timespec start, end;
-  clock_gettime(CLOCK_MONOTONIC, &start);
+  double avg = 0;
 
-  switch (opt.algorithm){
-    case RECURSIVE_FIBONACCI:
-      response = recursiveFibonacci(opt.value);
-      break;
-    case ITERATIVE_FIBONACCI:
-      response = iterativeFibonacci(opt.value);
-      break;
-    case RECURSIVE_FACTORIAL:
-      response = recursiveFactorial(opt.value);
-      break;
-    case ITERATIVE_FACTORIAL:
-      response = iterativeFactorial(opt.value);
-      break;
-    default:
-      fprintf(stderr, "Erro: Algoritmo desconhecido.\n");
-      printUsage();
-      exit(EXIT_FAILURE);
+  for (int i = 0; i < 3; i++) {
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    switch (opt.algorithm){
+      case RECURSIVE_FIBONACCI:
+        response = recursiveFibonacci(opt.value);
+        break;
+      case ITERATIVE_FIBONACCI:
+        response = iterativeFibonacci(opt.value);
+        break;
+      case RECURSIVE_FACTORIAL:
+        response = recursiveFactorial(opt.value);
+        break;
+      case ITERATIVE_FACTORIAL:
+        response = iterativeFactorial(opt.value);
+        break;
+      default:
+        fprintf(stderr, "Erro: Algoritmo desconhecido.\n");
+        printUsage();
+        exit(EXIT_FAILURE);
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+
+    double elapsed = ((end.tv_sec - start.tv_sec) * 1e9 + (end.tv_nsec - start.tv_nsec)) / 1000;
+
+    avg += elapsed;
   }
-
-  clock_gettime(CLOCK_MONOTONIC, &end);
-
-  double elapsed = ((end.tv_sec - start.tv_sec) * 1e9 + (end.tv_nsec - start.tv_nsec)) / 1000;
+  
+  avg = avg / 3;
 
   FILE *fp = fopen("csv/tempoDeRelogio.csv", "a");
   if (fp == NULL) {
@@ -122,11 +130,11 @@ int main (int argc, char ** argv){
     exit(EXIT_FAILURE);
   }
 
-  fprintf(fp, "%s, %d, %f\n", getAlgorithmNameById(opt.algorithm), opt.value, elapsed);
+  fprintf(fp, "%s, %d, %f\n", getAlgorithmNameById(opt.algorithm), opt.value, avg);
   fclose(fp);
 
   printf("Valor retornado: %lld\n", response);
-  printf("Tempo de execução: %f us\n", elapsed);
+  printf("Tempo de execução: %f us\n", avg);
 
   return EXIT_SUCCESS;
 }
