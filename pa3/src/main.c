@@ -114,9 +114,9 @@ int main (int argc, char ** argv){
 
   clock_gettime(CLOCK_MONOTONIC, &end);
 
-  double elapsed = (end.tv_sec - start.tv_sec) * 1e9 + (end.tv_nsec - start.tv_nsec);
+  double elapsed = ((end.tv_sec - start.tv_sec) * 1e9 + (end.tv_nsec - start.tv_nsec)) / 1000;
 
-  FILE *fp = fopen("../csv/tempoDeRelogio.csv", "a");
+  FILE *fp = fopen("csv/tempoDeRelogio.csv", "a");
   if (fp == NULL) {
     perror("Error opening file");
     exit(EXIT_FAILURE);
@@ -126,7 +126,7 @@ int main (int argc, char ** argv){
   fclose(fp);
 
   printf("Valor retornado: %lld\n", response);
-  printf("Tempo de execução: %f ns\n", elapsed);
+  printf("Tempo de execução: %f us\n", elapsed);
 
   return EXIT_SUCCESS;
 }
