@@ -4,6 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <time.h>
+#include <sys/resource.h>
 
 #define ITERATIVE_FIBONACCI 1
 #define RECURSIVE_FIBONACCI 2
@@ -91,50 +92,52 @@ int main (int argc, char ** argv){
   parseArguments(argc, argv, &opt);
   long long int response;
   struct timespec start, end;
-  double avg = 0;
+  struct rusage usage;
 
-  for (int i = 0; i < 3; i++) {
-    clock_gettime(CLOCK_MONOTONIC, &start);
+  clock_gettime(CLOCK_MONOTONIC, &start);
 
-    switch (opt.algorithm){
-      case RECURSIVE_FIBONACCI:
-        response = recursiveFibonacci(opt.value);
-        break;
-      case ITERATIVE_FIBONACCI:
-        response = iterativeFibonacci(opt.value);
-        break;
-      case RECURSIVE_FACTORIAL:
-        response = recursiveFactorial(opt.value);
-        break;
-      case ITERATIVE_FACTORIAL:
-        response = iterativeFactorial(opt.value);
-        break;
-      default:
-        fprintf(stderr, "Erro: Algoritmo desconhecido.\n");
-        printUsage();
-        exit(EXIT_FAILURE);
-    }
+  getrusage(RUSAGE_SELF, &usage);
 
-    clock_gettime(CLOCK_MONOTONIC, &end);
-
-    double elapsed = ((end.tv_sec - start.tv_sec) * 1e9 + (end.tv_nsec - start.tv_nsec)) / 1000;
-
-    avg += elapsed;
+  switch (opt.algorithm){
+    case RECURSIVE_FIBONACCI:
+      response = recursiveFibonacci(opt.value);
+      break;
+    case ITERATIVE_FIBONACCI:
+      response = iterativeFibonacci(opt.value);
+      break;
+    case RECURSIVE_FACTORIAL:
+      response = recursiveFactorial(opt.value);
+      break;
+    case ITERATIVE_FACTORIAL:
+      response = iterativeFactorial(opt.value);
+      break;
+    default:
+      fprintf(stderr, "Erro: Algoritmo desconhecido.\n");
+      printUsage();
+      exit(EXIT_FAILURE);
   }
-  
-  avg = avg / 3;
 
-  FILE *fp = fopen("csv/tempoDeRelogio.csv", "a");
+  getrusage(RUSAGE_SELF, &usage);
+
+  clock_gettime(CLOCK_MONOTONIC, &end);
+
+  double elapsed = ((end.tv_sec - start.tv_sec) * 1000.0) + ((end.tv_nsec - start.tv_nsec) / 1000000.0);
+
+  double userTime = usage.ru_utime.tv_sec * 1000.0 + usage.ru_utime.tv_usec / 1000.0;
+  double systemTime = usage.ru_stime.tv_sec * 1000.0 + usage.ru_stime.tv_usec / 1000.0;
+
+  FILE *fp = fopen("csv/tempos.csv", "a");
   if (fp == NULL) {
     perror("Error opening file");
     exit(EXIT_FAILURE);
   }
 
-  fprintf(fp, "%s, %d, %f\n", getAlgorithmNameById(opt.algorithm), opt.value, avg);
+  fprintf(fp, "%s, %d, %f, %f, %f\n", getAlgorithmNameById(opt.algorithm), opt.value, userTime, systemTime, elapsed);
   fclose(fp);
 
   printf("Valor retornado: %lld\n", response);
-  printf("Tempo de execução: %f us\n", avg);
+  printf("Tempo de sistema: %f ms\n", systemTime);
+  printf("Tempo de usuario: %f ms\n", userTime);
 
   return EXIT_SUCCESS;
 }
