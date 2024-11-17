@@ -1,0 +1,86 @@
+1. Erros identificados:
+    - Temos mais de um problema aqui:
+        - Não está sendo feita a alocação de memória para a matriz
+        - Não está sendo feita a liberação da memória armazenada para as colunas
+        - Está sendo feita a liberação da variável "text" porém ela nunca teve 
+            uma alocação feita.
+        - Há, também, uma duplicação de variáveis. A variável "rotation3D" é criada
+            globalmente e localmente dentro da main.
+
+2. Problema identificado com valgrind/gdb:
+    - Com gdb é possível ver o erro de segmentação.
+        Log do gdb ao rodar o código:
+        ```
+            Program received signal SIGSEGV, Segmentation fault.
+            0x000055555555517a in main () at c04.c:13
+            13      rotation3D->rows=4;
+        ```
+        O erro indica que ao tentar acessar rotation3D->rows houve um erro de 
+            segmentação. Isso acontece pela não alocação de memória para a matriz. 
+    - Com o valgrind foi possível identificar o erro acontecendo:
+        Log do valgrind:
+        ```
+            ==73283== Command: ./c04
+            ==73283== 
+            ==73283== Use of uninitialised value of size 8
+            ==73283==    at 0x10917A: main (c04.c:13)
+            ==73283== 
+            ==73283== Invalid write of size 4
+            ==73283==    at 0x10917A: main (c04.c:13)
+            ==73283==  Address 0x0 is not stack'd, malloc'd or (recently) free'd
+            ==73283== 
+            ==73283== 
+            ==73283== Process terminating with default action of signal 11 (SIGSEGV)
+            ==73283==  Access not within mapped region at address 0x0
+            ==73283==    at 0x10917A: main (c04.c:13)
+            ==73283==  If you believe this happened as a result of a stack
+            ==73283==  overflow in your program's main thread (unlikely but
+            ==73283==  possible), you can try to increase the size of the
+            ==73283==  main thread stack using the --main-stacksize= flag.
+            ==73283==  The main thread stack size used in this run was 8388608.
+            ==73283== 
+            ==73283== HEAP SUMMARY:
+            ==73283==     in use at exit: 0 bytes in 0 blocks
+            ==73283==   total heap usage: 0 allocs, 0 frees, 0 bytes allocated
+            ==73283== 
+            ==73283== All heap blocks were freed -- no leaks are possible
+            ==73283== 
+            ==73283== Use --track-origins=yes to see where uninitialised values come from
+            ==73283== For lists of detected and suppressed errors, rerun with: -s
+            ==73283== ERROR SUMMARY: 2 errors from 2 contexts (suppressed: 0 from 0)
+            Segmentation fault (core dumped)
+        ```
+       
+3. Correção do código, removendo os erros identificados:
+    - Adicionei a alocação de memória para a matriz
+    - Adicionei a liberação da memória armazenada para as colunas
+    - Removi a liberação da variável "text"
+    - Removi a duplicação da variável "rotation3D" global
+
+4. Problema não é mais identificado com valgrind/gdb:
+    - Com gdb o erro não acontece mais:
+        ```
+            Debuginfod has been enabled.
+            To make this setting permanent, add 'set debuginfod enabled on' to .gdbinit.
+            Downloading separate debug info for system-supplied DSO at 0x7ffff7fc3000
+            [Thread debugging using libthread_db enabled]                                                                                                                                      
+            Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+            [Inferior 1 (process 42850) exited normally]
+        ```
+    - Com valgrind tbm não:
+        ```
+            ==43154== Memcheck, a memory error detector
+            ==43154== Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward et al.
+            ==43154== Using Valgrind-3.22.0 and LibVEX; rerun with -h for copyright info
+            ==43154== Command: ./c04correto
+            ==43154== 
+            ==43154== 
+            ==43154== HEAP SUMMARY:
+            ==43154==     in use at exit: 0 bytes in 0 blocks
+            ==43154==   total heap usage: 6 allocs, 6 frees, 112 bytes allocated
+            ==43154== 
+            ==43154== All heap blocks were freed -- no leaks are possible
+            ==43154== 
+            ==43154== For lists of detected and suppressed errors, rerun with: -s
+            ==43154== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+        ```

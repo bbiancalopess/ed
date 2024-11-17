@@ -1,0 +1,20 @@
+1. A variável "buf" não é inicializada antes de ser usada
+
+2. O GDB identifica o erro:
+enter a number:
+1
+
+Program received signal SIGSEGV, Segmentation fault.
+Download failed: Invalid argument.  Continuing without source file ./string/../sysdeps/x86_64/multiarch/memmove-vec-unaligned-erms.S.
+__memcpy_evex_unaligned_erms () at ../sysdeps/x86_64/multiarch/memmove-vec-unaligned-erms.S:289
+warning: 289    ../sysdeps/x86_64/multiarch/memmove-vec-unaligned-erms.S: No such file or directory
+
+3. Para corrigir adicionei a inicialização de buf, assim como sua liberação ao final da utilização.
+
+4. O valgrind e o gdb não identificam mais os erros.
+GDB:
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+enter a number:
+4
+sum=10
+[Inferior 1 (process 66960) exited normally]

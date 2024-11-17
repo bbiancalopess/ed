@@ -1,0 +1,57 @@
+1. Está sendo feita uma divisão por 0
+
+2. GDB: 
+    Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+
+    Program received signal SIGFPE, Arithmetic exception.
+    0x000055555555513b in actual_calc (a=13, b=0) at c16.c:6
+    6         c = a / b;
+Valgrind:
+==63507== Memcheck, a memory error detector
+==63507== Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward et al.
+==63507== Using Valgrind-3.22.0 and LibVEX; rerun with -h for copyright info
+==63507== Command: ./c16
+==63507== 
+==63507== 
+==63507== Process terminating with default action of signal 8 (SIGFPE)
+==63507==  Integer divide by zero at address 0x1002E7FFD1
+==63507==    at 0x10913B: actual_calc (c16.c:6)
+==63507==    by 0x109170: calc (c16.c:15)
+==63507==    by 0x109189: main (c16.c:20)
+==63507== 
+==63507== HEAP SUMMARY:
+==63507==     in use at exit: 0 bytes in 0 blocks
+==63507==   total heap usage: 0 allocs, 0 frees, 0 bytes allocated
+==63507== 
+==63507== All heap blocks were freed -- no leaks are possible
+==63507== 
+==63507== For lists of detected and suppressed errors, rerun with: -s
+==63507== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+Floating point exception (core dumped)
+
+3. Para corrigir adicionei uma verificação para caso b seja 0.
+
+4. Agora, mensagens de erro são impressas ao invés de parar de rodar o código.
+GDB:
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+Error: Divisao por zero nao e permitida.
+Calculo falhou devido a valor invalido.
+[Inferior 1 (process 64027) exited normally]
+
+Valgrind:
+==64258== Memcheck, a memory error detector
+==64258== Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward et al.
+==64258== Using Valgrind-3.22.0 and LibVEX; rerun with -h for copyright info
+==64258== Command: ./c16correto
+==64258== 
+Error: Divisao por zero nao e permitida.
+Calculo falhou devido a valor invalido.
+==64258== 
+==64258== HEAP SUMMARY:
+==64258==     in use at exit: 0 bytes in 0 blocks
+==64258==   total heap usage: 0 allocs, 0 frees, 0 bytes allocated
+==64258== 
+==64258== All heap blocks were freed -- no leaks are possible
+==64258== 
+==64258== For lists of detected and suppressed errors, rerun with: -s
+==64258== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)

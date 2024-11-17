@@ -1,0 +1,34 @@
+1. O código é um loop de alocação de memória, de forma que a memória no ciclo seguinte sobrescreve a memória já alocada 
+    sem que tenha ocorrido a liberação dessa. Isso é feito infinitivamente.
+
+Obs.: Com o intuito de mostrar o vazamento de memória, limitei o loop a 100 iterações.
+
+2. No valgrind:
+==53566== 
+==53566== HEAP SUMMARY:
+==53566==     in use at exit: 12,800 bytes in 100 blocks
+==53566==   total heap usage: 101 allocs, 1 frees, 13,824 bytes allocated
+==53566== 
+==53566== LEAK SUMMARY:
+==53566==    definitely lost: 12,800 bytes in 100 blocks
+==53566==    indirectly lost: 0 bytes in 0 blocks
+==53566==      possibly lost: 0 bytes in 0 blocks
+==53566==    still reachable: 0 bytes in 0 blocks
+==53566==         suppressed: 0 bytes in 0 blocks
+==53566== Rerun with --leak-check=full to see details of leaked memory
+==53566== 
+==53566== For lists of detected and suppressed errors, rerun with: -s
+==53566== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+
+3. É necessário realizar a liberação da memória a cada loop.
+
+4. O valgrind não identifica erros mais:
+==53813== 
+==53813== HEAP SUMMARY:
+==53813==     in use at exit: 0 bytes in 0 blocks
+==53813==   total heap usage: 101 allocs, 101 frees, 13,824 bytes allocated
+==53813== 
+==53813== All heap blocks were freed -- no leaks are possible
+==53813== 
+==53813== For lists of detected and suppressed errors, rerun with: -s
+==53813== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)

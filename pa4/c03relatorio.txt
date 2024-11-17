@@ -1,0 +1,54 @@
+1. Erros identificados:
+    - O erro nesse código é a alocação de memória sendo feita dentro do for. Da forma que está sendo feita, a cada interação
+        a variável "a" é sobrescrita e, ao fazer o free no final, somente a última memória alocada é liberada, assim, toda a 
+        memória alocada nas outras iterações não são liberadas, causando vazamento de memória. 
+
+2. Problema identificado com valgrind/gdb:
+    - Com o valgrind é possível ver o log que expressa o vazamento de memória:
+        Log do valgrind:
+        ```
+            ==70743== Command: ./c03
+            ==70743== 
+            ==70743== 
+            ==70743== HEAP SUMMARY:
+            ==70743==     in use at exit: 3,600 bytes in 9 blocks
+            ==70743==   total heap usage: 10 allocs, 1 frees, 4,000 bytes allocated
+            ==70743== 
+            ==70743== LEAK SUMMARY:
+            ==70743==    definitely lost: 3,600 bytes in 9 blocks
+            ==70743==    indirectly lost: 0 bytes in 0 blocks
+            ==70743==      possibly lost: 0 bytes in 0 blocks
+            ==70743==    still reachable: 0 bytes in 0 blocks
+            ==70743==         suppressed: 0 bytes in 0 blocks
+            ==70743== Rerun with --leak-check=full to see details of leaked memory
+            ==70743== 
+            ==70743== For lists of detected and suppressed errors, rerun with: -s
+            ==70743== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+        ```
+        O log mostra que foram feitas 10 alocações e só 1 liberação. Além disso, também mostra a quantidade de bytes 
+        vazados: 3600 em 9 blocos.
+
+3. Correção do código, removendo os erros identificados:
+    - São possíveis duas correções nesse código que devem ser escolhidas de acordo com o propósito do código:
+        A primeira forma seria alocar a memória externamente ao for, garantindo que não sejam feitas inúmeras alocações 
+        sobreescrevendo outras. A segunda seria deixar a alocação dentro do for e adicionar a liberação a cada iteração.
+        Utilizei a segunda forma para corrigir o erro. É também interessante adicionar uma verificação de falha de alocação. 
+        Fiz isso adicionando um "if (!a) return -1;" 
+
+4. Problema não é mais identificado com valgrind:
+    - Ao analisar o código correto com valgrind, a ferramenta que havia identificado o erro, este não ocorre mais. É 
+        possível notar isso no log abaixo:
+        ```
+            ==71430== Command: ./c03correto
+            ==71430== 
+            ==71430== 
+            ==71430== HEAP SUMMARY:
+            ==71430==     in use at exit: 0 bytes in 0 blocks
+            ==71430==   total heap usage: 10 allocs, 10 frees, 4,000 bytes allocated
+            ==71430== 
+            ==71430== All heap blocks were freed -- no leaks are possible
+            ==71430== 
+            ==71430== For lists of detected and suppressed errors, rerun with: -s
+            ==71430== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+        ```
+        Como visto no log, foram feitas 10 alocações e 10 liberações de memória, assim como esperado.

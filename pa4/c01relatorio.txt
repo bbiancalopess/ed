@@ -1,0 +1,59 @@
+1. Erros identificados:
+    - Para a variável "a" é alocada uma memória para 10 inteiros, porém, o for varia de 0 a 10, tentando definir um 
+        valor para a décima posição de "a", que não teve memória alocada.
+
+2. Problema identificado com valgrind/gdb:
+    - Com o gdb nõa foi possível identificar nenhum erro. Nem pela mensagem mostrada no final da execução, nem por depuração.
+        Log do gdb ao rodar o código:
+        ```
+            [Inferior 1 (process 44950) exited normally]
+        ```
+        Para a depuração, analisei os valores de i durante a operação do for e de a[x] após a finalização do for. Mesmo 
+        não tendo espaço de memória alocada para a posição 10, o valor 10 foi armazenado em a[10].
+    - Com o valgrind foi possível identificar o erro acontecendo:
+        Log do valgrind:
+        ```
+            Command: ./c01
+            ==45917== 
+            ==45917== Invalid write of size 4
+            ==45917==    at 0x1091B8: main (c01.c:9)
+            ==45917==  Address 0x4a74044 is 0 bytes after a block of size 4 alloc'd
+            ==45917==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+            ==45917==    by 0x109185: main (c01.c:6)
+            ==45917== 
+            ==45917== 
+            ==45917== HEAP SUMMARY:
+            ==45917==     in use at exit: 0 bytes in 0 blocks
+            ==45917==   total heap usage: 1 allocs, 1 frees, 4 bytes allocated
+            ==45917== 
+            ==45917== All heap blocks were freed -- no leaks are possible
+            ==45917== 
+            ==45917== For lists of detected and suppressed errors, rerun with: -s
+            ==45917== ERROR SUMMARY: 10 errors from 1 contexts (suppressed: 0 from 0)
+        ```
+        O log exibe que o erro aconteceu na linha 9 do arquivo, justamente no local em que é feita a atribuição
+        de um valor à "a[i]". Também é exibido o erro específico, sendo esse um erro de escrita inválida de tamanho 4 (int),
+        assim como esperávamos que acontecesse para a posição 10 da variável "a". Apesar do erro, é interessante notar 
+        que o valgrind mostra que não aconteceu nenhum vazamento de memória pois toda a memória alocada foi liberada com free.
+
+3. Correção do código, removendo os erros identificados:
+    - Para corrigir o erro eu poderia aumentar o espaço alocado para a variável ou alterar o loop do for para o valor máximo 
+        suportado por "a". Levando em consideração que o objetivo do código é armazenar valores de 0 a 10, optei por aumentar
+        a alocação de memória para 11 * (sizeof(int)). 
+
+4. Problema não é mais identificado com valgrind/gdb:
+    - Ao analisar o código correto com valgrind, a ferramenta que havia identificado o erro, este não ocorre mais. É 
+        possível notar isso no log abaixo:
+        ```
+            Command: ./c01correto
+            ==47628== 
+            ==47628== 
+            ==47628== HEAP SUMMARY:
+            ==47628==     in use at exit: 0 bytes in 0 blocks
+            ==47628==   total heap usage: 1 allocs, 1 frees, 44 bytes allocated
+            ==47628== 
+            ==47628== All heap blocks were freed -- no leaks are possible
+            ==47628== 
+            ==47628== For lists of detected and suppressed errors, rerun with: -s
+            ==47628== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+        ```

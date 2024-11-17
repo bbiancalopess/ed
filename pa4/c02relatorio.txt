@@ -1,0 +1,83 @@
+1. Erros identificados:
+    - O erro nesse código é a tentativa dde printar o valor de a[9] quando o primeiro for apenas definiu valores até a[8].
+
+2. Problema identificado com valgrind/gdb:
+    - O gdb não apresenta nenhum erro, porém, nos logs causados pelos printf's do for é possível observar que para a[10]
+        é printado um valor estranho: 
+        Log do gdb ao rodar o código:
+        ```
+            0 1 2 3 4 5 6 7 8 32767 
+            [Inferior 1 (process 68527) exited normally]
+        ```
+        Para a depuração, analisei os valores de i durante a operação do for e de a[x] após a finalização do for. Mesmo 
+        não tendo espaço de memória alocada para a posição 10, o valor 10 foi armazenado em a[10].
+    - O valgrind, por outro lado, expressa  que um erro aconteceu:
+        Log do valgrind:
+        ```
+            ==68745== Command: ./c02
+            ==68745== 
+            ==68745== Conditional jump or move depends on uninitialised value(s)
+            ==68745==    at 0x48C90BB: __printf_buffer (vfprintf-process-arg.c:58)
+            ==68745==    by 0x48CA72A: __vfprintf_internal (vfprintf-internal.c:1544)
+            ==68745==    by 0x48BF1A2: printf (printf.c:33)
+            ==68745==    by 0x1091F1: main (c02.c:11)
+            ==68745== 
+            ==68745== Use of uninitialised value of size 8
+            ==68745==    at 0x48BE0AB: _itoa_word (_itoa.c:183)
+            ==68745==    by 0x48C8C8B: __printf_buffer (vfprintf-process-arg.c:155)
+            ==68745==    by 0x48CA72A: __vfprintf_internal (vfprintf-internal.c:1544)
+            ==68745==    by 0x48BF1A2: printf (printf.c:33)
+            ==68745==    by 0x1091F1: main (c02.c:11)
+            ==68745== 
+            ==68745== Conditional jump or move depends on uninitialised value(s)
+            ==68745==    at 0x48BE0BC: _itoa_word (_itoa.c:183)
+            ==68745==    by 0x48C8C8B: __printf_buffer (vfprintf-process-arg.c:155)
+            ==68745==    by 0x48CA72A: __vfprintf_internal (vfprintf-internal.c:1544)
+            ==68745==    by 0x48BF1A2: printf (printf.c:33)
+            ==68745==    by 0x1091F1: main (c02.c:11)
+            ==68745== 
+            ==68745== Conditional jump or move depends on uninitialised value(s)
+            ==68745==    at 0x48C8D79: __printf_buffer (vfprintf-process-arg.c:186)
+            ==68745==    by 0x48CA72A: __vfprintf_internal (vfprintf-internal.c:1544)
+            ==68745==    by 0x48BF1A2: printf (printf.c:33)
+            ==68745==    by 0x1091F1: main (c02.c:11)
+            ==68745== 
+            0 1 2 3 4 5 6 7 8 31 
+            ==68745== 
+            ==68745== HEAP SUMMARY:
+            ==68745==     in use at exit: 0 bytes in 0 blocks
+            ==68745==   total heap usage: 1 allocs, 1 frees, 1,024 bytes allocated
+            ==68745== 
+            ==68745== All heap blocks were freed -- no leaks are possible
+            ==68745== 
+            ==68745== Use --track-origins=yes to see where uninitialised values come from
+            ==68745== For lists of detected and suppressed errors, rerun with: -s
+            ==68745== ERROR SUMMARY: 6 errors from 4 contexts (suppressed: 0 from 0)
+        ```
+        O log exibe uma movimentação em um valor não inicializado.
+
+3. Correção do código, removendo os erros identificados:
+    - Levando em conta que o objetivo do código é armazenar e printar os 10 valores (0 a 9), alterei o for de atribuição 
+        de valores para um loop de 0 a 9. 
+
+4. Problema não é mais identificado com valgrind/gdb:
+    - Ao rodar o código com gdb é possível ver que os logs dos printf's estão como esperado:
+        ```
+            0 1 2 3 4 5 6 7 8 9 
+            [Inferior 1 (process 69398) exited normally]
+        ```
+    - Com o valgrind o log de erro não aparece mais e a contagem de erros é zerada:
+        ```
+            ==69726== Command: ./c02correto
+            ==69726== 
+            0 1 2 3 4 5 6 7 8 9 
+            ==69726== 
+            ==69726== HEAP SUMMARY:
+            ==69726==     in use at exit: 0 bytes in 0 blocks
+            ==69726==   total heap usage: 1 allocs, 1 frees, 1,024 bytes allocated
+            ==69726== 
+            ==69726== All heap blocks were freed -- no leaks are possible
+            ==69726== 
+            ==69726== For lists of detected and suppressed errors, rerun with: -s
+            ==69726== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+        ```

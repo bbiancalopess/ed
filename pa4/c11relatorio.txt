@@ -1,0 +1,37 @@
+1. A memória alocada para msg é menor que a string a ser alocada + '\0'. Também, não é feita a liberação da variável.
+
+2. Valgrind:
+==56984== 
+==56984== HEAP SUMMARY:
+==56984==     in use at exit: 8 bytes in 1 blocks
+==56984==   total heap usage: 2 allocs, 1 frees, 1,032 bytes allocated
+==56984== 
+==56984== LEAK SUMMARY:
+==56984==    definitely lost: 8 bytes in 1 blocks
+==56984==    indirectly lost: 0 bytes in 0 blocks
+==56984==      possibly lost: 0 bytes in 0 blocks
+==56984==    still reachable: 0 bytes in 0 blocks
+==56984==         suppressed: 0 bytes in 0 blocks
+==56984== Rerun with --leak-check=full to see details of leaked memory
+==56984== 
+==56984== For lists of detected and suppressed errors, rerun with: -s
+==56984== ERROR SUMMARY: 5 errors from 3 contexts (suppressed: 0 from 0)
+
+3. Para corrigir adequei a alocação ao tamanho da string e adicionei a liberação da variável.
+
+4. O valgrind não identifica mais os erros.
+==57609== Memcheck, a memory error detector
+==57609== Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward et al.
+==57609== Using Valgrind-3.22.0 and LibVEX; rerun with -h for copyright info
+==57609== Command: ./c11correto
+==57609== 
+57609, Rolberton
+==57609== 
+==57609== HEAP SUMMARY:
+==57609==     in use at exit: 0 bytes in 0 blocks
+==57609==   total heap usage: 2 allocs, 2 frees, 1,034 bytes allocated
+==57609== 
+==57609== All heap blocks were freed -- no leaks are possible
+==57609== 
+==57609== For lists of detected and suppressed errors, rerun with: -s
+==57609== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
