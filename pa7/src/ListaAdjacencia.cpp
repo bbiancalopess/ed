@@ -12,7 +12,7 @@ ListaAdjacencia::~ListaAdjacencia() {
 }
 
 void ListaAdjacencia::adicionaVertice() {
-    vertices.insereFinal(new Lista<int>());
+    vertices.insereInicio(new Lista<int>());
 }
 
 void ListaAdjacencia::adicionaAresta(int v, int w) {
@@ -43,4 +43,8 @@ void ListaAdjacencia::imprime() {
         std::cout << "Vertice " << i << ": ";
         vertices.getItem(i)->imprime();
     }
+}
+
+int ListaAdjacencia::grau(int v) {
+    return vertices.getItem(v)->getTamanho();
 }
