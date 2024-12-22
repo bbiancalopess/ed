@@ -8,6 +8,11 @@ void processaEntrada(Grafo &grafo) {
     int n;
     std::cin >> n;
 
+    if (std::cin.fail() || n <= 0) {
+        std::cerr << "Erro: O número de vértices deve ser um inteiro positivo.\n";
+        exit(1);
+    }
+
     for (int i = 0; i < n; ++i) {
         grafo.InsereVertice();
     }
@@ -15,9 +20,17 @@ void processaEntrada(Grafo &grafo) {
     for (int i = 0; i < n; ++i) {
         int m;
         std::cin >> m;
+        if (std::cin.fail() || m < 0 || m > n - 1) {
+            std::cerr << "Erro: O número de vizinhos deve ser um inteiro entre 0 e " << n - 1 << ".\n";
+            exit(1);
+        }
         for (int j = 0; j < m; ++j) {
             int vizinho;
             std::cin >> vizinho;
+            if (std::cin.fail() || vizinho < 0 || vizinho >= n) {
+                std::cerr << "Erro: O índice do vizinho deve ser um inteiro entre 0 e " << n - 1 << ".\n";
+                exit(1);
+            }
             if (vizinho != i)
                 grafo.InsereAresta(i, vizinho);
         }
