@@ -14,6 +14,7 @@ public:
     int getQuantidadeVertices();
     int getQuantidadeArestas();
     void imprime();
+    int grau(int v);
 
 private:
     Lista<Lista<int>*> vertices;

@@ -1,9 +1,9 @@
 COMPILADOR = g++
 COMPFLAGS = -Iinclude -Wall -pg
-TARGET = bin/pa3.out
+TARGET = bin/pa2.out
 
 # Lista de arquivos fontes
-SRCS = src/ListaAdjacencia.cpp src/graph.cpp src/main.cpp
+SRCS = src/heap.cpp src/main.cpp
 
 # Geração dos arquivos objetos
 OBJS = $(SRCS:src/%.cpp=obj/%.o)

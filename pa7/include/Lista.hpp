@@ -2,6 +2,10 @@
 #define LISTA_HPP
 
 #include "../include/Celula.hpp"
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdexcept>
 
 template<typename T>
 class Lista {
@@ -24,8 +28,9 @@ public:
 private:
     Celula<T>* primeiro;
     Celula<T>* ultimo;
-    Celula<T>* posiciona(int pos, bool antes);
+    Celula<T>* posiciona(int pos, bool antes = false);
     int tamanho;
 };
 
+#include "../src/Lista.cpp"
 #endif

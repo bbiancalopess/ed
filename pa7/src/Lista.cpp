@@ -1,7 +1,4 @@
 #include "../include/Lista.hpp"
-#include <stdio.h>
-#include <stdlib.h>
-#include <iostream>
 
 template<typename T>
 Lista<T>::Lista() {
@@ -19,8 +16,8 @@ Lista<T>::~Lista() {
 
 template<typename T>
 Celula<T>* Lista<T>::posiciona(int pos, bool antes) {
-    if ((pos > tamanho) || (pos <= 0))
-        throw "ERRO: Posicao inválida!";
+    if ((pos > tamanho) || (pos < 0))
+        throw std::out_of_range("ERRO: Posicao invalida!");
     
     Celula<T> *p = primeiro;
     for (int i = 1; i < pos; i++) {
@@ -35,8 +32,7 @@ Celula<T>* Lista<T>::posiciona(int pos, bool antes) {
 
 template<typename T>
 T Lista<T>::getItem(int pos){
-    Celula<T> *p = posiciona(pos);
-    return p->item;
+    return posiciona(pos)->item;
 }
 
 template<typename T>
@@ -82,7 +78,7 @@ void Lista<T>::inserePosicao(T item, int pos) {
 template<typename T>
 T Lista<T>::removeInicio() {
     if (tamanho == 0)
-        throw "ERRO: Lista vazia!";
+        throw std::underflow_error("ERRO: Lista vazia!");
     
     Celula<T> *p = primeiro->prox;
     primeiro->prox = p->prox;
@@ -98,7 +94,7 @@ T Lista<T>::removeInicio() {
 template<typename T>
 T Lista<T>::removeFinal() {
     if (tamanho == 0)
-        throw "ERRO: Lista vazia!";
+        throw std::underflow_error("ERRO: Lista vazia!");
 
     Celula<T> *p = posiciona(tamanho, true);
 
@@ -114,7 +110,7 @@ T Lista<T>::removeFinal() {
 template<typename T>
 T Lista<T>::removePosicao(int pos) {
     if (tamanho == 0)
-        throw "ERRO: Lista vazia!";
+        throw std::underflow_error("ERRO: Lista vazia!");
        
     Celula<T> *p = posiciona(pos, true);
     Celula<T> *q = p->prox;
@@ -132,7 +128,7 @@ T Lista<T>::removePosicao(int pos) {
 template<typename T>
 T Lista<T>::pesquisa(T c) {
     if (tamanho == 0)
-        throw "ERRO: Lista vazia!";
+        throw std::underflow_error("ERRO: Lista vazia!");
     
     Celula<T> *p = primeiro->prox;
     while (p != NULL) {
@@ -142,7 +138,7 @@ T Lista<T>::pesquisa(T c) {
         p = p->prox;
     }
 
-    throw "ERRO: Item nao encontrado!";
+    throw std::logic_error("ERRO: Item nao encontrado!");
 }
 
 template<typename T>
@@ -150,7 +146,9 @@ void Lista<T>::imprime() {
     Celula<T> *p = primeiro->prox;
 
     while (p != NULL) {
+
         std::cout << p->item << " ";
+
         p = p->prox;
     }
 

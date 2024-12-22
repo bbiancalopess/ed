@@ -18,28 +18,27 @@ int Grafo::QuantidadeVertices() {
 }
 
 int Grafo::QuantidadeArestas() {
-    return vertices.getQuantidadeArestas();
+    return vertices.getQuantidadeArestas() / 2;
 }
 
 int Grafo::GrauMinimo() {
-    int grauMin = vertices.getVizinhos(0)->getTamanho();
+    int grauMin = vertices.grau(0);
     for (int i = 1; i < vertices.getQuantidadeVertices(); ++i) {
-        if (vertices.getVizinhos(i)->getTamanho() < grauMin)
-            grauMin = vertices.getVizinhos(i)->getTamanho();
+        if (vertices.grau(i) < grauMin)
+            grauMin = vertices.grau(i);
     }
     return grauMin;
 }
 
 int Grafo::GrauMaximo() {
-    int grauMax = vertices.getVizinhos(0)->getTamanho();
+    int grauMax = vertices.grau(0);
     for (int i = 1; i < vertices.getQuantidadeVertices(); ++i) {
-        if (vertices.getVizinhos(i)->getTamanho() > grauMax)
-            grauMax = vertices.getVizinhos(i)->getTamanho();
+        if (vertices.grau(i) > grauMax)
+            grauMax = vertices.grau(i);
     }
-    return grauMax;
+    return grauMax / 2;
 }
 
 void Grafo::ImprimeVizinhos(int v) {
-    std::cout << "Vizinhos do vertice " << v << ": ";
     vertices.getVizinhos(v)->imprime();
 }
