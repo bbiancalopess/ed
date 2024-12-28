@@ -1,6 +1,6 @@
 COMPILADOR = g++
 COMPFLAGS = -Iinclude -Wall -pg
-TARGET = bin/pa2.out
+TARGET = bin/pa.out
 
 # Lista de arquivos fontes
 SRCS = src/Node.cpp src/ArvoreBinaria.cpp src/main.cpp
