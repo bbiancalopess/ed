@@ -16,9 +16,9 @@ public:
     void posOrdem(Node* p);
     Node* raiz;
 private:
-    Node* insereRecursivo(Node* p, int item);
+    void insereRecursivo(Node*& p, int item);
     void apagaRecursivo(Node* p);
-    Node* removeRecursivo(Node* p, int item);
+    void removeRecursivo(Node*& p, int item);
     Node* encontraMinimo(Node* p);
 };
 

@@ -9,20 +9,19 @@ ArvoreBinaria::~ArvoreBinaria() {
 }
 
 void ArvoreBinaria::insere(int item) {
-    this->raiz = this->insereRecursivo(this->raiz, item);
+    this->insereRecursivo(this->raiz, item);
 }
 
-Node* ArvoreBinaria::insereRecursivo(Node* p, int item) {
+void ArvoreBinaria::insereRecursivo(Node*& p, int item) {
     if (p == NULL) {
         p = new Node();
         p->item = item;
     } else {
         if (item < p->item)
-            p->esq = this->insereRecursivo(p->esq, item);
+            this->insereRecursivo(p->esq, item);
         else
-            p->dir = this->insereRecursivo(p->dir, item);
+            this->insereRecursivo(p->dir, item);
     }
-    return p;
 }
 
 void ArvoreBinaria::preOrdem(Node* p) {
@@ -63,33 +62,35 @@ void ArvoreBinaria::apagaRecursivo(Node* p) {
 }
 
 void ArvoreBinaria::remove(int item) {
-    this->raiz = this->removeRecursivo(this->raiz, item);
+    this->removeRecursivo(this->raiz, item);
 }
 
-Node* ArvoreBinaria::removeRecursivo(Node* p, int item) {
+void ArvoreBinaria::removeRecursivo(Node*& p, int item) {
     if (p == NULL)
-        return NULL;
+        return;
     
     if (item < p->item)
-        p->esq = this->removeRecursivo(p->esq, item);
+        this->removeRecursivo(p->esq, item);
     else if (item > p->item)
-        p->dir = this->removeRecursivo(p->dir, item);
+        this->removeRecursivo(p->dir, item);
     else {
-        if (p->esq == NULL) {
-            Node* temp = p->dir;
+        if (p->esq == NULL && p->dir == NULL) {
             delete p;
-            return temp;
+            p = NULL;
+        } else if (p->esq == NULL) {
+            Node* temp = p;
+            p = p->dir;
+            delete temp;
         } else if (p->dir == NULL) {
-            Node* temp = p->esq;
-            delete p;
-            return temp;
+            Node* temp = p;
+            p = p->esq;
+            delete temp;
         } else {
             Node* sucessor = this->encontraMinimo(p->dir);
             p->item = sucessor->item;
-            p->dir = this->removeRecursivo(p->dir, sucessor->item);
+            this->removeRecursivo(p->dir, sucessor->item);
         }
     }
-    return p;
 }
 
 Node* ArvoreBinaria::encontraMinimo(Node* p) {
